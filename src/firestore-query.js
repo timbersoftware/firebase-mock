@@ -181,7 +181,13 @@ MockFirestoreQuery.prototype.where = function (property, operator, value) {
 
     case 'array-contains':
       _.forEach(this.data, function(data, key) {
-        if (_.includes(_.get(data, property), value)) {
+        const isFirestoreDoc = value.constructor.name === 'MockFirestoreDocument'
+        if (isFirestoreDoc) {
+          const paths = _.get(data, property).map(obj => obj.path)
+          if (_.includes(paths, value.path)) {
+            results[key] = _.cloneDeep(data);
+          }
+        } else if (_.includes(_.get(data, property), value)) {
           results[key] = _.cloneDeep(data);
         }
       });
