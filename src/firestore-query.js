@@ -180,9 +180,11 @@ MockFirestoreQuery.prototype.where = function (property, operator, value) {
       break;
 
     case 'array-contains':
-      if (_.includes(_.get(data, property), value)) {
-        results[key] = _.cloneDeep(data);
-      }
+      _.forEach(this.data, function(data, key) {
+        if (_.includes(_.get(data, property), value)) {
+          results[key] = _.cloneDeep(data);
+        }
+      });
       break;
 
     default:
