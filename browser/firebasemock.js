@@ -47154,25 +47154,25 @@ var Promise = function () {
   /**
     `catch` is simply sugar for `then(undefined, onRejection)` which makes it the same
     as the catch block of a try/catch statement.
-  
+
     ```js
     function findAuthor(){
       throw new Error('couldn\'t find that author');
     }
-  
+
     // synchronous
     try {
       findAuthor();
     } catch(reason) {
       // something went wrong
     }
-  
+
     // async with promises
     findAuthor().catch(function(reason){
       // something went wrong
     });
     ```
-  
+
     @method catch
     @param {Function} onRejection
     @param {String} label optional string for labeling the promise.
@@ -47188,9 +47188,9 @@ var Promise = function () {
   /**
     `finally` will be invoked regardless of the promise's fate just as native
     try/catch/finally behaves
-  
+
     Synchronous example:
-  
+
     ```js
     findAuthor() {
       if (Math.random() > 0.5) {
@@ -47198,7 +47198,7 @@ var Promise = function () {
       }
       return new Author();
     }
-  
+
     try {
       return findAuthor(); // succeed or fail
     } catch(error) {
@@ -47208,9 +47208,9 @@ var Promise = function () {
       // doesn't affect the return value
     }
     ```
-  
+
     Asynchronous example:
-  
+
     ```js
     findAuthor().catch(function(reason){
       return findOtherAuthor();
@@ -47218,7 +47218,7 @@ var Promise = function () {
       // author was either found, or not
     });
     ```
-  
+
     @method finally
     @param {Function} callback
     @param {String} label optional string for labeling the promise.
@@ -51565,6 +51565,12 @@ MockFirestoreQuery.prototype.where = function (property, operator, value) {
           results[key] = _.cloneDeep(data);
         }
       });
+      break;
+
+    case 'array-contains':
+      if (_.includes(_.get(data, property), value)) {
+        results[key] = _.cloneDeep(data);
+      }
       break;
 
     default:

@@ -179,6 +179,12 @@ MockFirestoreQuery.prototype.where = function (property, operator, value) {
       });
       break;
 
+    case 'array-contains':
+      if (_.includes(_.get(data, property), value)) {
+        results[key] = _.cloneDeep(data);
+      }
+      break;
+
     default:
       console.warn('unsupported operator');
       return new MockFirestoreQuery(this.path, null, this.parent, this.id);
