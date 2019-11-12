@@ -51517,7 +51517,10 @@ MockFirestoreQuery.prototype.where = function (property, operator, value) {
   switch (operator) {
     case '==':
       _.forEach(this.data, function(data, key) {
-        if (_.isEqual(_.get(data, property), value)) {
+        const isFirestoreDoc = value.constructor.name === 'MockFirestoreDocument'
+        if (isFirestoreDoc && value.path === _.get(data, property).path) {
+          results[key] = _.cloneDeep(data);
+        } else if (_.isEqual(_.get(data, property), value)) {
           results[key] = _.cloneDeep(data);
         }
       });
