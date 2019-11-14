@@ -137,6 +137,28 @@ MockFirestore.prototype.batch = function () {
   return batch;
 };
 
+MockFirestore.prototype.collectionGroup = function (subcollection) {
+  // need to find all subcollections with the name `subcollection`
+  const children = []
+  this._findAllSubcollections (subcollection, this, children)
+  if (children.length) {
+    // TODO: support more than just 1 result
+    return children[0]
+  } else {
+    return this.collection(subcollection)
+  }
+}
+
+MockFirestore.prototype._findAllSubcollections = function (name, obj, foundObjs) {
+  _.forEach(obj.children, (value, key) => {
+    if (key === name) {
+      foundObjs.push(value)
+    } else {
+      return this._findAllSubcollections (name, value, foundObjs)
+    }
+  })
+}
+
 MockFirestore.prototype.collection = function (path) {
   return this._child(path, false);
 };
