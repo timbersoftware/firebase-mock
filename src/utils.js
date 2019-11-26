@@ -2,6 +2,7 @@
 
 var Snapshot = require('./snapshot');
 var FieldValue = require('./firestore-field-value');
+var MockFirestoreDocument = require('./firestore-document')
 var _ = require('./lodash');
 
 exports.makeRefSnap = function makeRefSnap(ref) {
@@ -108,12 +109,12 @@ exports.removeEmptyRtdbProperties = function removeEmptyRtdbProperties(obj) {
   }
 };
 
-exports.removeEmptyFirestoreProperties = function removeEmptyFirestoreProperties(obj) {
+exports.removeEmptyFirestoreProperties = function removeEmptyFirestoreProperties(obj, current) {
   var t = typeof obj;
   if (t === 'boolean' || t === 'string' || t === 'number' || t === 'undefined') {
     return obj;
   }
-  if (obj instanceof Date) return obj;
+  if (obj instanceof Date || obj instanceof MockFirestoreDocument) return obj;
 
   var keys = getKeys(obj);
   if (keys.length > 0) {
@@ -124,6 +125,20 @@ exports.removeEmptyFirestoreProperties = function removeEmptyFirestoreProperties
       }
       if (FieldValue.serverTimestamp().isEqual(value)) {
         obj[s] = new Date();
+      }
+      if (FieldValue.arrayRemove().isEqual(value)) {
+        const needle = value.arg;
+        obj[s] = current[s].filter(function(e) {
+          if (e instanceof MockFirestoreDocument && needle instanceof MockFirestoreDocument) {
+            return e.path !== needle.path
+          } else {
+            return replacement.indexOf(e) === -1
+          }
+        });
+      }
+      if (FieldValue.arrayUnion().isEqual(value)) {
+        const replacement = Array.isArray(value.arg) ? value.arg : [value.arg];
+        obj[s] = _.union(current[s], replacement);
       }
     }
   }

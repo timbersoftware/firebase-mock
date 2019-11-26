@@ -153,6 +153,7 @@ MockFirestoreDocument.prototype._update = function (changes, opts, callback) {
     self._defer('update', _.toArray(arguments), function () {
       if (!err) {
         var base = self._getData();
+        var original = _.cloneDeep(base);
         var data;
         if (_opts.setMerge) {
           data = _.merge(_.isObject(base) ? base : {}, changes);
@@ -166,10 +167,7 @@ MockFirestoreDocument.prototype._update = function (changes, opts, callback) {
             data = _.assign(_.isObject(base) ? base : {}, utils.updateToFirestoreObject(changes));
           }
         }
-        // Removed because there's a bug in this code an infinite loop occurs. My guess is that
-        // this is here due to the fact that you can "remove" fields by unsetting them or marking
-        // them as null. We don't have this use-case right now, so safely turning off.
-        // data = utils.removeEmptyFirestoreProperties(data);
+        data = utils.removeEmptyFirestoreProperties(data, original);
         self._dataChanged(data);
         resolve(data);
       } else {
